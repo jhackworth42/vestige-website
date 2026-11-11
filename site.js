@@ -1,9 +1,27 @@
-const APP_STORE_URL = '';
-const SUPPORT_EMAIL = 'jop.hackworth@gmail.com';
-for (const link of document.querySelectorAll('.app-store-link')) {
-  if (APP_STORE_URL) { link.href = APP_STORE_URL; link.target = '_blank'; link.rel = 'noopener noreferrer'; }
-  else { link.href = '#'; link.addEventListener('click', event => { event.preventDefault(); alert('Vestige is coming to the App Store.'); }); }
+// Set this only after Apple provides the official public listing URL.
+const SITE_CONFIG = Object.freeze({
+  appStoreUrl: '',
+  supportEmail: 'jop.hackworth@gmail.com',
+});
+
+if (SITE_CONFIG.appStoreUrl) {
+  const url = new URL(SITE_CONFIG.appStoreUrl);
+  if (url.protocol === 'https:' && url.hostname === 'apps.apple.com') {
+    document.querySelectorAll('[data-store-link]').forEach((placeholder) => {
+      const link = document.createElement('a');
+      link.className = placeholder.className.replace('pending', 'available');
+      link.href = url.href;
+      link.rel = 'noopener noreferrer';
+      link.target = '_blank';
+      link.textContent = placeholder.dataset.label || 'App Store';
+      placeholder.replaceWith(link);
+    });
+  }
 }
-for (const link of document.querySelectorAll('.support-email')) {
-  link.href = 'mailto:' + SUPPORT_EMAIL; link.textContent = SUPPORT_EMAIL;
-}
+
+document.querySelectorAll('[data-support-email]').forEach((placeholder) => {
+  const link = document.createElement('a');
+  link.href = 'mailto:' + SITE_CONFIG.supportEmail;
+  link.textContent = SITE_CONFIG.supportEmail;
+  placeholder.replaceWith(link);
+});
